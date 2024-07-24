@@ -1,0 +1,7 @@
+{
+    "clangd.fallbackFlags": [
+        "-I",
+        "${workspaceFolder}/software/151_library",
+        "-m32"
+    ]
+}
