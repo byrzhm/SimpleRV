@@ -1,5 +1,4 @@
-#ifndef TYPES_H_
-#define TYPES_H_
+#pragma once
 
 typedef unsigned char  uint8_t;
 typedef unsigned short uint16_t;
@@ -13,5 +12,3 @@ typedef int   int32_t;
 
 #define TRUE  1
 #define FALSE 0
-
-#endif
