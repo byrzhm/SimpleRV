@@ -162,7 +162,7 @@ module core #(
     );
 
     // Connect DMEM
-    assign dmem_addr = alu_out;
+    assign dmem_addr = alu_out[DWIDTH-1:2];
     assign dmem_dw = rf_data_b;
 
     // Load MUX
