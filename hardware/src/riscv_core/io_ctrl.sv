@@ -33,7 +33,7 @@ module io_ctrl #(
       .rst(rst),
       .ce (led_reg_ce)
   );
-  assign led_reg_ce = en & (addr == 4'b1000);
+  assign led_reg_ce = en & (addr == 4'b1000) & wbe[0];
   
 
   // TODO: Read logic
