@@ -1,4 +1,4 @@
-`include "../src/alu_ops.vh"
+`include "alu_ops.vh"
 
 module alu #(
     parameter DWIDTH = 32

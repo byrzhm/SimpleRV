@@ -1,70 +1,79 @@
+`timescale 1ns / 1ns
+`include "mem_path.vh"
+
 module asm_tb ();
-
   reg clk, rst;
+  parameter CPU_CLOCK_PERIOD = 20;
+  parameter CPU_CLOCK_FREQ = 1_000_000_000 / CPU_CLOCK_PERIOD;
 
-  // dut
-  core CORE (
+  initial clk = 0;
+  always #(CPU_CLOCK_PERIOD / 2) clk = ~clk;
+
+  reg bp_enable = 1'b0;
+
+  cpu #(
+      .CPU_CLOCK_FREQ(CPU_CLOCK_FREQ),
+      .RESET_PC(32'h1000_0000)
+  ) cpu (
       .clk(clk),
-      .rst(rst)
+      .rst(rst),
+      .leds(),
+      .serial_in(1'b1),
+      .serial_out()
   );
 
-  integer num_mismatch = 0;
+  // A task to check if the value contained in a register equals an expected value
+  task check_reg;
+    input [4:0] reg_number;
+    input [31:0] expected_value;
+    input [10:0] test_num;
+    if (expected_value !== `RF_PATH.mem[reg_number]) begin
+      $display("FAIL - test %d, got: %d, expected: %d for reg %d", test_num,
+               `RF_PATH.mem[reg_number], expected_value, reg_number);
+      $finish();
+    end else begin
+      $display("PASS - test %d, got: %d for reg %d", test_num, expected_value, reg_number);
+    end
+  endtask
 
-  initial begin
-    clk = 0;
-    $readmemh("test_asm.hex", CORE.IMEM.mem);
-    // $display("IMEM[0] = %h", CORE.IMEM.mem[0]);
-    // $monitor("[TIME %t] PC=%h instr=%h rf_we=%b",
-    //           $time, CORE.pc, CORE.instr, CORE.rf_we);
-  end
+  // A task that runs the simulation until a register contains some value
+  task wait_for_reg_to_equal;
+    input [4:0] reg_number;
+    input [31:0] expected_value;
+    while (`RF_PATH.mem[reg_number] !== expected_value) @(posedge clk);
+  endtask
 
   initial begin
     $dumpfile("asm_tb.fst");
     $dumpvars(0, asm_tb);
-    rst = 1;
 
-    repeat (2) @(posedge clk);
+    #1;
+    $readmemh("../../software/asm/asm.hex", `IMEM_PATH.mem, 0, 2**10 - 1);
+    $readmemh("../../software/asm/asm.hex", `DMEM_PATH.mem, 0, 2**10 - 1);
+
+    // Reset the CPU
+    rst = 1;
+    repeat (10) @(posedge clk);  // Hold reset for 10 cycles
+    @(negedge clk);
     rst = 0;
 
-    repeat (5) @(posedge clk);
-    #1;
+    // Your processor should begin executing the code in /software/asm/start.s
 
-    assert (CORE.RF.registers[0] == 32'd0)
-    else begin
-      $error("x0 expect: %d actual: %d", 32'd0, CORE.RF.registers[0]);
-      num_mismatch = num_mismatch + 1;
-    end
+    // Test ADD
+    wait_for_reg_to_equal(20, 32'd1);  // Run the simulation until the flag is set to 1
+    check_reg(1, 32'd300, 1);  // Verify that x1 contains 300
 
-    assert (CORE.RF.registers[1] == 32'd5)
-    else begin
-      $error("x1 expect: %d actual: %d", 32'd5, CORE.RF.registers[1]);
-      num_mismatch = num_mismatch + 1;
-    end
-
-    assert (CORE.RF.registers[2] == 32'd10)
-    else begin
-      $error("x2 expect: %d actual: %d", 32'd10, CORE.RF.registers[2]);
-      num_mismatch = num_mismatch + 1;
-    end
-
-    assert (CORE.RF.registers[3] == 32'd10)
-    else begin
-      $error("x2 expect: %d actual: %d", 32'd10, CORE.RF.registers[3]);
-      num_mismatch = num_mismatch + 1;
-    end
-
-    assert (CORE.DMEM.mem[0] == 32'd10)
-    else begin
-      $error("dmem[0] expect: %d actual: %d", 32'd10, CORE.DMEM.mem[0]);
-      num_mismatch = num_mismatch + 1;
-    end
-
-    if (num_mismatch == 0) $display("All tests passed");
-    else $display("%d tests failed", num_mismatch);
-
-    $finish;
+    // Test BEQ
+    wait_for_reg_to_equal(20, 32'd2);  // Run the simulation until the flag is set to 2
+    check_reg(1, 32'd500, 2);  // Verify that x1 contains 500
+    check_reg(2, 32'd100, 3);  // Verify that x2 contains 100
+    $display("ALL ASSEMBLY TESTS PASSED!");
+    $finish();
   end
 
-  always #5 clk = ~clk;
-
+  initial begin
+    repeat (100) @(posedge clk);
+    $display("Failed: timing out");
+    $fatal();
+  end
 endmodule

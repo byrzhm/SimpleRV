@@ -23,8 +23,7 @@ $(TARGET).elf: $(SOURCES)
 	$(RISCV)-objdump -D -Mnumeric $@ > $(basename $@).dump
 	$(RISCV)-strip -R .comment -R .note.gnu.build-id -R .riscv.attributes $@
 	$(RISCV)-objcopy $(basename $@).elf -O binary $(basename $@).bin
-	xxd -g 4 -c 4 $(basename $@).bin > $(basename $@).hex.temp
-	awk '{print $$2}' $(basename $@).hex.temp > $(basename $@).hex
+	bin2hex $(basename $@).bin > $(basename $@).hex
 
 clean:
 	rm -f *.elf *.dump *.hex *.bin

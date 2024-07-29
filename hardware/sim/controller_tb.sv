@@ -1,7 +1,8 @@
-`include "../src/control_signals.vh"
-`include "../src/alu_ops.vh"
-`include "../src/imm_types.vh"
-`include "../src/opcode.vh"
+`timescale 1ns / 1ns
+`include "../src/riscv_core/control_signals.vh"
+`include "../src/riscv_core/alu_ops.vh"
+`include "../src/riscv_core/imm_types.vh"
+`include "../src/riscv_core/opcode.vh"
 
 module controller_tb ();
 
@@ -16,7 +17,7 @@ module controller_tb ();
   wire br_un;
   wire a_sel, b_sel;
   wire [`ALUOP_WIDTH-1:0] alu_sel;
-  wire [DWIDTH/8-1:0] dmem_wbe;
+  wire [1:0] st_sel;
   wire [2:0] ld_sel;
   wire [1:0] wb_sel;
 
@@ -24,24 +25,26 @@ module controller_tb ();
   controller #(
       .DWIDTH(DWIDTH)
   ) CONTROLLER (
-      .instr(instr),
-      .pc_sel(pc_sel),
+      .instr  (instr),
+      .pc_sel (pc_sel),
       .imm_sel(imm_sel),
-      .rf_we(rf_we),
-      .br_eq(br_eq),
-      .br_lt(br_lt),
-      .br_un(br_un),
-      .a_sel(a_sel),
-      .b_sel(b_sel),
+      .rf_we  (rf_we),
+      .br_eq  (br_eq),
+      .br_lt  (br_lt),
+      .br_un  (br_un),
+      .a_sel  (a_sel),
+      .b_sel  (b_sel),
       .alu_sel(alu_sel),
-      .dmem_wbe(dmem_wbe),
-      .ld_sel(ld_sel),
-      .wb_sel(wb_sel)
+      .st_sel (st_sel),
+      .ld_sel (ld_sel),
+      .wb_sel (wb_sel)
   );
 
   integer num_mismatch = 0;
 
   initial begin
+    $dumpfile("controller_tb.fst");
+    $dumpvars(0, controller_tb);
 
     // test LUI
     // lui x1, 0x1000
@@ -52,10 +55,9 @@ module controller_tb ();
             imm_sel === `IMM_U &&
             b_sel === `B_IMM &&
             alu_sel === `ALU_B &&
-            dmem_wbe === 0 &&
+            st_sel === 0 &&
             rf_we === 1 &&
-            wb_sel ===
-    `WB_ALU
+            wb_sel === `WB_ALU
     )
     else begin
       $error("LUI failed");
@@ -72,10 +74,9 @@ module controller_tb ();
             a_sel === `A_PC &&
             b_sel === `B_IMM &&
             alu_sel === `ALU_ADD &&
-            dmem_wbe === 0 &&
+            st_sel === 0 &&
             rf_we === 1 &&
-            wb_sel ===
-    `WB_ALU
+            wb_sel === `WB_ALU
     )
     else begin
       $error("AUIPC failed");
@@ -92,10 +93,9 @@ module controller_tb ();
             a_sel === `A_PC &&
             b_sel === `B_IMM &&
             alu_sel === `ALU_ADD &&
-            dmem_wbe === 0 &&
+            st_sel === 0 &&
             rf_we === 1 &&
-            wb_sel ===
-    `WB_PC
+            wb_sel === `WB_PC
     )
     else begin
       $error("JAL failed");
@@ -112,10 +112,9 @@ module controller_tb ();
             imm_sel === `IMM_I &&
             b_sel === `B_IMM &&
             alu_sel === `ALU_ADD &&
-            dmem_wbe === 0 &&
+            st_sel === 0 &&
             rf_we === 1 &&
-            wb_sel ===
-    `WB_PC
+            wb_sel === `WB_PC
     )
     else begin
       $error("JALR failed");
@@ -133,11 +132,10 @@ module controller_tb ();
             pc_sel === `PC_ALU &&
             imm_sel === `IMM_B &&
             rf_we === 0 &&
-            dmem_wbe === 0 &&
+            st_sel === 0 &&
             a_sel === `A_PC &&
             b_sel === `B_IMM &&
-            alu_sel ===
-    `ALU_ADD
+            alu_sel === `ALU_ADD
     )
     else begin
       $error("BEQ(taken) failed");
@@ -152,11 +150,10 @@ module controller_tb ();
             pc_sel === `PC_PLUS_4 &&
             imm_sel === `IMM_B &&
             rf_we === 0 &&
-            dmem_wbe === 0 &&
+            st_sel === 0 &&
             a_sel === `A_PC &&
             b_sel === `B_IMM &&
-            alu_sel ===
-    `ALU_ADD
+            alu_sel === `ALU_ADD
     )
     else begin
       $error("BEQ(not taken) failed");
@@ -175,8 +172,7 @@ module controller_tb ();
             a_sel === `A_REG &&
             b_sel === `B_IMM &&
             alu_sel === `ALU_ADD &&
-            dmem_wbe ===
-    `STR_WORD
+            st_sel === `ST_WORD
     )
     else begin
       $error("SW failed");
@@ -194,10 +190,9 @@ module controller_tb ();
             a_sel === `A_REG &&
             b_sel === `B_IMM &&
             alu_sel === `ALU_ADD &&
-            dmem_wbe === 0 &&
+            st_sel === 0 &&
             ld_sel === `LD_WORD &&
-            wb_sel ===
-    `WB_MEM
+            wb_sel === `WB_MEM
     )
     else begin
       $error("LW failed");
@@ -214,9 +209,8 @@ module controller_tb ();
             a_sel === `A_REG &&
             b_sel === `B_REG &&
             alu_sel === `ALU_SUB &&
-            dmem_wbe === 0 &&
-            wb_sel ===
-    `WB_ALU
+            st_sel === 0 &&
+            wb_sel === `WB_ALU
     )
     else begin
       $error("SUB failed");
@@ -234,9 +228,8 @@ module controller_tb ();
             a_sel === `A_REG &&
             b_sel === `B_IMM &&
             alu_sel === `ALU_SRA &&
-            dmem_wbe === 0 &&
-            wb_sel ===
-    `WB_ALU
+            st_sel === 0 &&
+            wb_sel === `WB_ALU
     )
     else begin
       $error("SRAI failed");
@@ -246,7 +239,7 @@ module controller_tb ();
       if (a_sel !== `A_REG) $display("a_sel: %b", a_sel);
       if (b_sel !== `B_IMM) $display("b_sel: %b", b_sel);
       if (alu_sel !== `ALU_SRA) $display("alu_sel: %b", alu_sel);
-      if (dmem_wbe !== 0) $display("dmem_wbe: %b", dmem_wbe);
+      if (st_sel !== 0) $display("st_sel: %b", st_sel);
       if (wb_sel !== `WB_ALU) $display("wb_sel: %b", wb_sel);
       num_mismatch = num_mismatch + 1;
     end
@@ -257,6 +250,7 @@ module controller_tb ();
       $display("Failed %0d tests", num_mismatch);
     end
 
+    $finish;
   end
 
 endmodule

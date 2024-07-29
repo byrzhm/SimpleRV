@@ -1,4 +1,5 @@
-`include "../src/alu_ops.vh"
+`timescale 1ns / 1ns
+`include "../src/riscv_core/alu_ops.vh"
 
 module alu_tb ();
 
@@ -21,6 +22,9 @@ module alu_tb ();
   integer num_mismatch = 0;
 
   initial begin
+    $dumpfile("alu_tb.fst");
+    $dumpvars(0, alu_tb);
+
     // test add
     a = 32'h00000000;
     b = 32'h00000001;

@@ -1,3 +1,5 @@
+`timescale 1ns / 1ns
+
 module comparator_tb ();
 
   parameter DWIDTH = 32;
@@ -19,6 +21,8 @@ module comparator_tb ();
   integer num_mismatches = 0;
 
   initial begin
+    $dumpfile("comparator_tb.fst");
+    $dumpvars(0, comparator_tb);
 
     // Test unsigned comparison
     a = 32'h00000000;
@@ -98,6 +102,8 @@ module comparator_tb ();
 
     if (num_mismatches === 0) $display("All tests passed");
     else $display("%d tests failed", num_mismatches);
+
+    $finish;
   end
 
 endmodule

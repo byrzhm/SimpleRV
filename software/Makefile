@@ -1,4 +1,4 @@
-SUBDIRS := bios echo
+SUBDIRS := bios echo led asm
 
 all: $(SUBDIRS)
 

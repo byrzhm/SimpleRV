@@ -1,25 +1,30 @@
+`timescale 1ns / 1ns
+
 module imem_tb ();
 
   parameter DWIDTH = 32;
   parameter AWIDTH = 4;
 
-  reg  [AWIDTH-1:0] addr;
-  wire [DWIDTH-1:0] instr;
+  reg [AWIDTH-1:0] addr;
+  wire [DWIDTH-1:0] dout;
+  wire [DWIDTH-1:0] instr = dout;
 
   imem #(
       .DWIDTH(DWIDTH),
       .AWIDTH(AWIDTH)
-  ) imem (
-      .addr (addr),
-      .instr(instr)
+  ) IMEM (
+      .addr(addr),
+      .dout(dout)
   );
 
-  integer i;
   integer num_mismatch = 0;
 
   initial begin
     $dumpfile("imem_tb.fst");
     $dumpvars(0, imem_tb);
+
+    #1;
+    $readmemh("init_imem.hex", IMEM.mem, 0, 2 ** AWIDTH - 1);
 
     addr = 0;
     if (instr !== 32'h0) begin

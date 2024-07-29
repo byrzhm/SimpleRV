@@ -1,9 +1,9 @@
 `ifndef CONTROL_SIGNALS
 `define CONTROL_SIGNALS
 
-`define    STR_BYTE       4'b0001
-`define    STR_HALF       4'b0011
-`define    STR_WORD       4'b1111
+`define    ST_BYTE        2'b01
+`define    ST_HALF        2'b10
+`define    ST_WORD        2'b11
 `define    LD_BYTE        3'b000
 `define    LD_BYTE_UN     3'b100
 `define    LD_HALF        3'b001

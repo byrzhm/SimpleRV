@@ -1,4 +1,5 @@
-`include "../src/imm_types.vh"
+`timescale 1ns / 1ns
+`include "../src/riscv_core/imm_types.vh"
 
 module immgen_tb ();
 

@@ -8,7 +8,7 @@ module comparator #(
     output br_lt
 );
 
-    assign br_eq = (a == b);
-    assign br_lt = (br_un) ? (a < b) : ($signed(a) < $signed(b));
+  assign br_eq = (a == b);
+  assign br_lt = (br_un) ? (a < b) : ($signed(a) < $signed(b));
 
 endmodule

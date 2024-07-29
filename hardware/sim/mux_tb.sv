@@ -1,4 +1,4 @@
-`include "../src/control_signals.vh"
+`timescale 1ns / 1ns
 
 module mux_tb ();
 
@@ -7,9 +7,7 @@ module mux_tb ();
   reg sel2to1;
   reg [1:0] sel4to1;
   reg [DWIDTH-1:0] in0, in1, in2, in3;
-  reg [2:0] ld_sel;
-  reg [DWIDTH-1:0] in;
-  wire [DWIDTH-1:0] out2to1, out4to1, out_ld;
+  wire [DWIDTH-1:0] out2to1, out4to1;
 
   // dut
   mux2to1 #(
@@ -30,14 +28,6 @@ module mux_tb ();
       .in3(in3),
       .sel(sel4to1),
       .out(out4to1)
-  );
-
-  loadmux #(
-      .DWIDTH(DWIDTH)
-  ) LOADMUX (
-      .in(in),
-      .ld_sel(ld_sel),
-      .out(out_ld)
   );
 
   integer num_mismatch = 0;
@@ -100,50 +90,8 @@ module mux_tb ();
       num_mismatch = num_mismatch + 1;
     end
 
-    // test loadmux
-    in = 32'h0000ffff;
-    ld_sel = `LD_BYTE;
-    #1;
-    assert (out_ld === 32'hffffffff)
-    else begin
-      $error("LOADMUX failed: expected %h, got %h", 32'hffffffff, out_ld);
-      num_mismatch = num_mismatch + 1;
-    end
-
-    ld_sel = `LD_BYTE_UN;
-    #1;
-    assert (out_ld === 32'h000000ff)
-    else begin
-      $error("LOADMUX failed: expected %h, got %h", 32'h000000ff, out_ld);
-      num_mismatch = num_mismatch + 1;
-    end
-
-    ld_sel = `LD_HALF;
-    #1;
-    assert (out_ld === 32'hffffffff)
-    else begin
-      $error("LOADMUX failed: expected %h, got %h", 32'hffffffff, out_ld);
-      num_mismatch = num_mismatch + 1;
-    end
-
-    ld_sel = `LD_HALF_UN;
-    #1;
-    assert (out_ld === 32'h0000ffff)
-    else begin
-      $error("LOADMUX failed: expected %h, got %h", 32'h0000ffff, out_ld);
-      num_mismatch = num_mismatch + 1;
-    end
-
-    ld_sel = `LD_WORD;
-    #1;
-    assert (out_ld === 32'h0000ffff)
-    else begin
-      $error("LOADMUX failed: expected %h, got %h", 32'h0000ffff, out_ld);
-      num_mismatch = num_mismatch + 1;
-    end
-
     if (num_mismatch == 0) begin
-      $display("all tests pass");
+      $display("All tests pass");
     end else begin
       $display("%d tests failed", num_mismatch);
     end
