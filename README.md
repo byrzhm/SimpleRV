@@ -4,11 +4,37 @@ This is a single-cycle implementation of RV32I.
 
 ## FPGA Verification
 
+**test program**
+
+```c
+#define HOLD_CYCLE 200000 // small for simulation, large for real board
+#define FPGA_LED (*((volatile unsigned int *)0x80000020))
+
+int main() {
+  for (;;) {
+    FPGA_LED = 0x01;
+    for (int i = 0; i < HOLD_CYCLE; i++)
+      ;
+    FPGA_LED = 0x02;
+    for (int i = 0; i < HOLD_CYCLE; i++)
+      ;
+    FPGA_LED = 0x04;
+    for (int i = 0; i < HOLD_CYCLE; i++)
+      ;
+    FPGA_LED = 0x08;
+    for (int i = 0; i < HOLD_CYCLE; i++)
+      ;
+  }
+  return 0;
+}
+```
+
 ### Alinx AX7020
 
 ![Alinx AX7020](https://www.alinx.com/upload/image/20220823/AX7020.jpg)
 
-The buttons and leds are active low in Alinx AX7020 board, so you need to invert output leds and input buttons in top module.
+> [!CAUTION]
+> The buttons and leds are *active low* in Alinx AX7020 board, so you need to invert output leds and input buttons in top module.
 
 #### invert leds
 
@@ -47,8 +73,13 @@ The buttons and leds are active low in Alinx AX7020 board, so you need to invert
   );
 ```
 
+https://github.com/user-attachments/assets/ee57e0df-fc14-4283-ae6c-762fa20b9fd6
+
 ### DE10-Standard
 
 ![DE10-Standard](https://www.terasic.com.tw/attachment/archive/1105/image/45degree.jpg)
 
-DE10-Standard board's leds and buttons are active high, so you don't need to invert these signals.
+> [!NOTE]
+> DE10-Standard board's leds and buttons are active high, so you don't need to invert those signals.
+
+https://github.com/user-attachments/assets/f44a90f7-ef65-4027-a040-9b9f26abeea9
