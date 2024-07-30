@@ -82,4 +82,4 @@ https://github.com/user-attachments/assets/ee57e0df-fc14-4283-ae6c-762fa20b9fd6
 > [!NOTE]
 > DE10-Standard board's leds and buttons are active high, so you don't need to invert those signals.
 
-https://github.com/user-attachments/assets/f44a90f7-ef65-4027-a040-9b9f26abeea9
+https://github.com/user-attachments/assets/d60a96e2-cb31-4924-92dd-a46ed77d2210
