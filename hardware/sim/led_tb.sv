@@ -1,8 +1,7 @@
 `timescale 1ns / 1ns
 `include "../src/riscv_core/opcode.vh"
-`include "mem_path.vh"
 
-module bios_tb ();
+module led_tb ();
   reg clk, rst;
   wire [3:0] leds;
   parameter CPU_CLOCK_PERIOD = 20;
@@ -68,8 +67,8 @@ module bios_tb ();
   endtask
 
   initial begin
-    $dumpfile("bios_tb.fst");
-    $dumpvars(0, bios_tb);
+    $dumpfile("led_tb.fst");
+    $dumpvars(0, led_tb);
 
     rst = 1;
 

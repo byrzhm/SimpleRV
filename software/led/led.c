@@ -1,4 +1,4 @@
-#define HOLD_CYCLE 100
+#define HOLD_CYCLE 200000 // small for simulation, large for real board
 #define FPGA_LED (*((volatile unsigned int *)0x80000020))
 
 int main() {

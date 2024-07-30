@@ -25,7 +25,7 @@ module io_ctrl #(
   wire led_reg_ce;
   REGISTER_R_CE #(
       .N(4),
-      .INIT(4'b0)
+      .INIT(4'b0000)
   ) led_reg (
       .q  (leds),
       .d  (din[3:0]),
@@ -34,6 +34,7 @@ module io_ctrl #(
       .ce (led_reg_ce)
   );
   assign led_reg_ce = en & (addr == 4'b1000) & wbe[0];
+    // assign leds = 4'b1110; // debug
   
 
   // TODO: Read logic

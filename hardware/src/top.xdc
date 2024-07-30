@@ -14,7 +14,7 @@ set_property -dict {PACKAGE_PIN N15 IOSTANDARD LVCMOS33} [get_ports {FPGA_BUTTON
 
 ## Clock signal 125 MHz
 
-set_property -dict {PACKAGE_PIN H16 IOSTANDARD LVCMOS33} [get_ports CLK_50MHZ_FPGA]
+set_property -dict {PACKAGE_PIN U18 IOSTANDARD LVCMOS33} [get_ports CLK_50MHZ_FPGA]
 create_clock -period 20.000 -name CLK_50MHZ_FPGA -waveform {0.000 10.000} -add [get_ports CLK_50MHZ_FPGA]
 
 #set_property -dict {PACKAGE_PIN XXX IOSTANDARD LVCMOS33} [get_ports CTS]
